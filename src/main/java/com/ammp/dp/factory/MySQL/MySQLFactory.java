@@ -6,7 +6,7 @@ public class MySQLFactory extends SQLFactory {
 
     @Override
     public Connection createConenction(String hostname, String user, String password) {
-        return new MySQLConnection();
+        return new MySQLConnection(hostname, user, password);
     }
 
     @Override

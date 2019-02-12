@@ -21,9 +21,7 @@ public class PSQLConnection extends Connection {
             java.sql.Connection conn = null;
             try {
                 Class.forName("oracle.jdbc.driver.OracleDriver");
-                conn =
-                        DriverManager.getConnection("jdbc:mysql://localhost/test?" +
-                                "user=root&password=password");
+                conn = DriverManager.getConnection(hostname, user, password);
             } catch (SQLException ex) {
                 handleException(ex);
             } catch (ClassNotFoundException e) {

@@ -30,6 +30,8 @@ public class SaveAccessProtector {
         connection = Objects.requireNonNull(sqlFactory).createConenction(hostname, user, password);
     }
 
+
+    public List<Object> selectFromDB(SQLInput sqlInput){
     public void setUserID(int userID) {
         this.userID = userID;
     }
