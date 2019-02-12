@@ -10,6 +10,7 @@ public class PSQLConnection extends Connection {
     private String database;
     private String user;
     private String password;
+    private java.sql.Connection conn = null;
 
     public PSQLConnection(String hostname, String database, String user, String password) {
         this.hostname = hostname;
@@ -20,14 +21,15 @@ public class PSQLConnection extends Connection {
 
     @Override
     public java.sql.Connection getConnection() {
-        java.sql.Connection conn = null;
-        try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            conn = DriverManager.getConnection(hostname, user, password);
-        } catch (SQLException ex) {
-            handleException(ex);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        if (conn == null) {
+            try {
+                Class.forName("oracle.jdbc.driver.OracleDriver");
+                conn = DriverManager.getConnection(hostname, user, password);
+            } catch (SQLException ex) {
+                handleException(ex);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
         return conn;
     }

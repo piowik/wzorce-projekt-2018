@@ -15,9 +15,7 @@ public class PSQLStatement implements Statement {
 
     @Override
     public java.sql.Statement getStatement() throws SQLException {
-        if (this.statement == null) {
-            this.statement = connection.getConnection().createStatement();
-        }
+        this.statement = connection.getConnection().createStatement();
         return this.statement;
     }
 }

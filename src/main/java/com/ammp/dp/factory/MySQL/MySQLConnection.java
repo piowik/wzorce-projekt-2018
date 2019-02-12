@@ -12,6 +12,7 @@ public class MySQLConnection extends Connection {
     private String database;
     private String user;
     private String password;
+    private java.sql.Connection conn;
 
     public MySQLConnection(String hostname, String database, String user, String password) {
         this.hostname = hostname;
@@ -22,15 +23,16 @@ public class MySQLConnection extends Connection {
 
     @Override
     public java.sql.Connection getConnection() {
-        java.sql.Connection conn = null;
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            String connectionString = String.format("%s%s/%s?user=%s&password=%s", JDBC_MYSQL, hostname, database, user, password);
-            conn = DriverManager.getConnection(connectionString);
-        } catch (SQLException ex) {
-            handleException(ex);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        if (conn == null) {
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                String connectionString = String.format("%s%s/%s?user=%s&password=%s", JDBC_MYSQL, hostname, database, user, password);
+                conn = DriverManager.getConnection(connectionString);
+            } catch (SQLException ex) {
+                handleException(ex);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
         return conn;
     }
