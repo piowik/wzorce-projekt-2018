@@ -17,7 +17,7 @@ public class PSQLFactory extends SQLFactory {
     }
 
     @Override
-    public Commit createCommit() {
+    public Commit createCommit(Connection connection) {
         return new PSQLCommit();
     }
 }

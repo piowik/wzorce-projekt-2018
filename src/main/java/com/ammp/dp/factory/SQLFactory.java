@@ -6,6 +6,6 @@ public abstract class SQLFactory {
 
     public abstract Statement createStatement(Connection connection);
 
-    public abstract Commit createCommit();
+    public abstract Commit createCommit(Connection connection);
 
 }

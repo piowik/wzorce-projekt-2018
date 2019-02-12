@@ -18,7 +18,7 @@ public class MySQLFactory extends SQLFactory {
     }
 
     @Override
-    public Commit createCommit() {
-        return new MySQLCommit();
+    public Commit createCommit(Connection connection) {
+        return new MySQLCommit(connection);
     }
 }
