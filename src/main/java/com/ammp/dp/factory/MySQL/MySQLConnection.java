@@ -1,4 +1,7 @@
-package com.ammp.dp.factory;
+package com.ammp.dp.factory.MySQL;
+
+import com.ammp.dp.factory.Connection;
+import com.ammp.dp.factory.Statement;
 
 import javax.sql.DataSource;
 import java.sql.DriverManager;
@@ -22,5 +25,6 @@ public class MySQLConnection extends Connection {
         }
         return conn;
     }
+
 }
 

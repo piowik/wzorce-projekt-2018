@@ -1,9 +1,11 @@
-package com.ammp.dp.factory;
+package com.ammp.dp.factory.PSQL;
+
+import com.ammp.dp.factory.Connection;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class PSQLConnection extends Connection{
+public class PSQLConnection extends Connection {
     private String hostname;
     private String user;
     private String password;
