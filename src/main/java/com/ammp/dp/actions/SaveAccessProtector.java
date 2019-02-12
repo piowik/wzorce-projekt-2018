@@ -50,10 +50,50 @@ public class SaveAccessProtector {
         }
     }
 
+    private String prepareRoleConditionWithAnd(){
+        return null; //TODO
+    }
+
+    private String prepareRoleConditionWithouAnd(){
+        return null; //TODO
+    }
+
     public ResultSet execute(String query) {
-        //TODO: prepare WHERE statement (check if where already exists, group by, limit, order etc)
-        query = query + " WHERE MinRole > 4";
-        databaseStatement.execute(query);
+        int offset = 2;
+        int index = 0;
+        String suffixQuery;
+        String prefixQuery;
+        String finalQuery = "";
+        String roleCondition;
+        query = query.toUpperCase();
+
+        if (query.contains(Constants.WHERE)){
+            roleCondition = prepareRoleConditionWithAnd();
+            
+            index = query.indexOf(Constants.WHERE);
+            int roleConditionIndex = index + Constants.WHERE.length() + offset;
+
+            prefixQuery = query.substring(0, roleConditionIndex - 1);
+            suffixQuery = query.substring(roleConditionIndex);
+
+            finalQuery = prefixQuery + " " + roleCondition + " " + suffixQuery;
+        } else {
+            if(query.contains(Constants.GROUP_BY)){
+                index = query.indexOf(Constants.GROUP_BY);
+            } else if(query.contains(Constants.ORDER_BY)){
+                index = query.indexOf(Constants.ORDER_BY);
+            }
+            roleCondition = prepareRoleConditionWithAnd();
+            int roleConditionIndex = index - 1;
+
+            prefixQuery = query.substring(0, roleConditionIndex);
+            suffixQuery = query.substring(roleConditionIndex);
+
+            finalQuery = prefixQuery + " " + roleCondition + " " + suffixQuery;
+        }
+
+        databaseStatement.execute(finalQuery);
         return databaseStatement.getResultSet();
+
     }
 }
