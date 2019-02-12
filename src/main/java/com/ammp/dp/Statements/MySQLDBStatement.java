@@ -25,6 +25,15 @@ public class MySQLDBStatement extends DatabaseStatement {
     }
 
     @Override
+    public void commit() {
+        try {
+            commit.createCommit(connection);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void execute(String query) {
         try {
             prepareStatment();

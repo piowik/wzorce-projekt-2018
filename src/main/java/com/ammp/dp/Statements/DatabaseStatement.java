@@ -17,6 +17,8 @@ public abstract class DatabaseStatement {
 
     protected abstract void prepareStatment() throws SQLException;
 
+    public abstract void commit();
+
     public abstract void execute(String query);
 
     public abstract ResultSet getResultSet();
