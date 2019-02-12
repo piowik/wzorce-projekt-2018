@@ -50,12 +50,26 @@ public class SaveAccessProtector {
         }
     }
 
-    private String prepareRoleConditionWithAnd(){
-        return null; //TODO
+    private String prepareRoleConditionWithAnd() {
+        StringBuilder stringBuilder = new StringBuilder(" (MinRole is null OR MinRole in (");
+        for (int i = 0; i < userAndChildren.size(); i++) {
+            stringBuilder.append("'" + userAndChildren.get(i) + "'");
+            if (i < userAndChildren.size() - 1)
+                stringBuilder.append(", ");
+        }
+        stringBuilder.append(")) and (");
+        return stringBuilder.toString();
     }
 
-    private String prepareRoleConditionWithouAnd(){
-        return null; //TODO
+    private String prepareRoleConditionWithoutAnd() {
+        StringBuilder stringBuilder = new StringBuilder("WHERE MinRole is null OR MinRole in (");
+        for (int i = 0; i < userAndChildren.size(); i++) {
+            stringBuilder.append("'" + userAndChildren.get(i) + "'");
+            if (i < userAndChildren.size() - 1)
+                stringBuilder.append(", ");
+        }
+        stringBuilder.append(") ");
+        return stringBuilder.toString();
     }
 
     public ResultSet execute(String query) {
@@ -67,23 +81,23 @@ public class SaveAccessProtector {
         String roleCondition;
         query = query.toUpperCase();
 
-        if (query.contains(Constants.WHERE)){
+        if (query.contains(Constants.WHERE)) {
             roleCondition = prepareRoleConditionWithAnd();
-            
+
             index = query.indexOf(Constants.WHERE);
             int roleConditionIndex = index + Constants.WHERE.length() + offset;
 
             prefixQuery = query.substring(0, roleConditionIndex - 1);
             suffixQuery = query.substring(roleConditionIndex);
-
+            // TODO: ")" at the end
             finalQuery = prefixQuery + " " + roleCondition + " " + suffixQuery;
         } else {
-            if(query.contains(Constants.GROUP_BY)){
+            if (query.contains(Constants.GROUP_BY)) {
                 index = query.indexOf(Constants.GROUP_BY);
-            } else if(query.contains(Constants.ORDER_BY)){
+            } else if (query.contains(Constants.ORDER_BY)) {
                 index = query.indexOf(Constants.ORDER_BY);
             }
-            roleCondition = prepareRoleConditionWithAnd();
+            roleCondition = prepareRoleConditionWithoutAnd();
             int roleConditionIndex = index - 1;
 
             prefixQuery = query.substring(0, roleConditionIndex);
