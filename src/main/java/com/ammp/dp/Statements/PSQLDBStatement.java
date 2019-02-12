@@ -1,6 +1,6 @@
 package com.ammp.dp.Statements;
 
-import com.ammp.dp.factory.PSQL.PostgreSQLFactory;
+import com.ammp.dp.factory.PSQL.PSQLFactory;
 import com.ammp.dp.factory.SQLFactory;
 
 import java.sql.ResultSet;
@@ -9,13 +9,16 @@ import java.sql.SQLException;
 public class PSQLDBStatement extends DatabaseStatement {
     private SQLFactory factory;
     private java.sql.Statement mysqlStatement;
-    public PSQLDBStatement(PostgreSQLFactory factory){
-        this.factory=factory;
+
+    public PSQLDBStatement(PSQLFactory factory) {
+        this.factory = factory;
     }
+
     @Override
     public void connect(String hostname, String database, String user, String password) {
         connection = factory.createConenction(hostname, database, user, password);
     }
+
     @Override
     protected void prepareStatment() throws SQLException {
         statement = factory.createStatement(connection);

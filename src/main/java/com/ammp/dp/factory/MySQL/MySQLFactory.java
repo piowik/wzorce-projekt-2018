@@ -1,6 +1,9 @@
 package com.ammp.dp.factory.MySQL;
 
-import com.ammp.dp.factory.*;
+import com.ammp.dp.factory.Commit;
+import com.ammp.dp.factory.Connection;
+import com.ammp.dp.factory.SQLFactory;
+import com.ammp.dp.factory.Statement;
 
 public class MySQLFactory extends SQLFactory {
 

@@ -1,9 +1,7 @@
 package com.ammp.dp.factory.MySQL;
 
 import com.ammp.dp.factory.Connection;
-import com.ammp.dp.factory.Statement;
 
-import javax.sql.DataSource;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 

@@ -14,8 +14,11 @@ public abstract class DatabaseStatement {
     protected Connection connection;
 
     public abstract void connect(String hostname, String database, String user, String password);
+
     protected abstract void prepareStatment() throws SQLException;
-    public abstract void execute(String query );
+
+    public abstract void execute(String query);
+
     public abstract ResultSet getResultSet();
 //    public abstract ResultSet getResultSet();
 }

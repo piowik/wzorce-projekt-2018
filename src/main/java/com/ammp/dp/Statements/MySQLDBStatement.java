@@ -8,9 +8,11 @@ import java.sql.SQLException;
 public class MySQLDBStatement extends DatabaseStatement {
     private SQLFactory factory;
     private java.sql.Statement mysqlStatement;
-    public MySQLDBStatement(SQLFactory factory){
-        this.factory=factory;
+
+    public MySQLDBStatement(SQLFactory factory) {
+        this.factory = factory;
     }
+
     @Override
     public void connect(String hostname, String database, String user, String password) {
         connection = factory.createConenction(hostname, database, user, password);

@@ -19,17 +19,17 @@ public class PSQLConnection extends Connection {
     }
 
     @Override
-        public java.sql.Connection getConnection(){
-            java.sql.Connection conn = null;
-            try {
-                Class.forName("oracle.jdbc.driver.OracleDriver");
-                conn = DriverManager.getConnection(hostname, user, password);
-            } catch (SQLException ex) {
-                handleException(ex);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-            return conn;
+    public java.sql.Connection getConnection() {
+        java.sql.Connection conn = null;
+        try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            conn = DriverManager.getConnection(hostname, user, password);
+        } catch (SQLException ex) {
+            handleException(ex);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
+        return conn;
+    }
 
 }

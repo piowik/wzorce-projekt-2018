@@ -3,14 +3,10 @@ package com.ammp.dp.actions;
 import com.ammp.dp.Statements.DatabaseStatement;
 import com.ammp.dp.Statements.MySQLDBStatement;
 import com.ammp.dp.Statements.PSQLDBStatement;
-import com.ammp.dp.factory.Commit;
-import com.ammp.dp.factory.Connection;
 import com.ammp.dp.factory.MySQL.MySQLFactory;
-import com.ammp.dp.factory.PSQL.PostgreSQLFactory;
+import com.ammp.dp.factory.PSQL.PSQLFactory;
 
 import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
 
 public class SaveAccessProtector {
     private DatabaseStatement databaseStatement;
@@ -29,7 +25,7 @@ public class SaveAccessProtector {
 
     public void connect(String hostname, String database, String user, String password, String dbType) {
         if (dbType.equals(Constants.POSTGRESQL)) {
-            databaseStatement = new PSQLDBStatement(new PostgreSQLFactory());
+            databaseStatement = new PSQLDBStatement(new PSQLFactory());
         } else if (dbType.equals(Constants.MYSQL)) {
             databaseStatement = new MySQLDBStatement(new MySQLFactory());
         }
@@ -55,7 +51,7 @@ public class SaveAccessProtector {
     }
 
     public ResultSet execute(String query) {
-        //TODO: prepare WHERE statement
+        //TODO: prepare WHERE statement (check if where already exists, group by, limit, order etc)
         query = query + " WHERE MinRole > 4";
         databaseStatement.execute(query);
         return databaseStatement.getResultSet();
