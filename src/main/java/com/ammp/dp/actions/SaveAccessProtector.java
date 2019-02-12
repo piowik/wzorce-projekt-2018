@@ -16,14 +16,16 @@ public class SaveAccessProtector {
     private Commit commit;
     private Connection connection;
     private Statement statement;
+
     private SQLFactory sqlFactory;
     private ArrayList<Integer> children;
     private int userID;
 
     public SaveAccessProtector(String hostname, String user, String password, String dbType) {
-        if (dbType.equals(Constants.POSTGRESQL)) {
+
+        if(dbType.equals(Constants.POSTGRESQL)){
             sqlFactory = new PostgreSQLFactory();
-        } else if (dbType.equals(Constants.MYSQL)) {
+        } else if (dbType.equals(Constants.MYSQL)){
             sqlFactory = new MySQLFactory();
         }
 
@@ -31,14 +33,10 @@ public class SaveAccessProtector {
     }
 
 
-    public List<Object> selectFromDB(SQLInput sqlInput){
     public void setUserID(int userID) {
         this.userID = userID;
     }
 
-    public List<Object> selectFromDB(SQLInput sqlInput, long userId) {
-        return null;
-    }
 
     private void getAllChildren(int id) throws java.sql.SQLException {
         String query = "SELECT * FROM roles WHERE RoleID="+Integer.toString(id);
