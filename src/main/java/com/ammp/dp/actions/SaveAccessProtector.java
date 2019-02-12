@@ -7,10 +7,15 @@ import com.ammp.dp.factory.MySQL.MySQLFactory;
 import com.ammp.dp.factory.PSQL.PSQLFactory;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class SaveAccessProtector {
     private DatabaseStatement databaseStatement;
-    private int userID;
+    private String userID;
+    private HashMap<String,List<String>> rolesTree;
+    private List<String> userAndChildren;
 
     private static class Wrapper {
         private static SaveAccessProtector instance = new SaveAccessProtector();
@@ -30,23 +35,45 @@ public class SaveAccessProtector {
             databaseStatement = new MySQLDBStatement(new MySQLFactory());
         }
         databaseStatement.connect(hostname, database, user, password);
+        buildRolesTree();
     }
 
-    public void setUserID(int userID) {
+    public void setUserID(String userID) {
         this.userID = userID;
+        userAndChildren=new ArrayList<>();
+        userAndChildren.add(userID);
+        fillChildrenByID(userID);
     }
 
     private void buildRolesTree() {
-        // TODO: buildRolesTree
+        HashMap<String,List<String>> tree=new HashMap<>();
         databaseStatement.execute("SELECT * FROM roles");
         ResultSet resultSet = databaseStatement.getResultSet();
         try {
             while (resultSet.next()) {
-                int childID = resultSet.getInt("ChildID");
-                System.out.println("Found " + childID);
+                String roleID = resultSet.getString("RoleID");
+                String childID = resultSet.getString("ChildID");
+                if(tree.containsKey(roleID))
+                    tree.get(roleID).add(childID);
+                else {
+                    List<String> newChildren = new ArrayList<>();
+                    newChildren.add(childID);
+                    tree.put(roleID, newChildren);
+                }
             }
         } catch (java.sql.SQLException e) {
             e.printStackTrace();
+        }
+        rolesTree=tree;
+    }
+    
+    private void fillChildrenByID(String userID) {
+        List<String> children = rolesTree.get(userID);
+        for (String child: children ) {
+            if(child==null)
+                return;
+            userAndChildren.add(child);
+            fillChildrenByID(child);
         }
     }
 
