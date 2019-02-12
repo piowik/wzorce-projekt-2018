@@ -1,6 +1,5 @@
 package com.ammp.dp.actions;
 
-import com.ammp.dp.Constants;
 import com.ammp.dp.factory.*;
 import com.ammp.dp.factory.MySQL.MySQLFactory;
 import com.ammp.dp.factory.PSQL.PostgreSQLFactory;
@@ -19,7 +18,7 @@ public class SaveAccessProtector {
 
     public SaveAccessProtector(String hostname, String user, String password, String dbType) {
 
-        if(dbType.equals(Constants.POSTGERSQL)){
+        if(dbType.equals(Constants.POSTGRESQL)){
             sqlFactory = new PostgreSQLFactory();
         } else if (dbType.equals(Constants.MYSQL)){
             sqlFactory = new MySQLFactory();
