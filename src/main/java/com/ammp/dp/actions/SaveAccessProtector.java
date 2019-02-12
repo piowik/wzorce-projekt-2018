@@ -8,10 +8,15 @@ import com.ammp.dp.factory.MySQL.MySQLFactory;
 import com.ammp.dp.factory.PSQL.PSQLFactory;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class SaveAccessProtector {
     private DatabaseStatement databaseStatement;
-    private int userID;
+    private String userID;
+    private HashMap<String,List<String>> rolesTree;
+    private List<String> userAndChildren;
 
     private static class Wrapper {
         private static SaveAccessProtector instance = new SaveAccessProtector();
@@ -31,32 +36,68 @@ public class SaveAccessProtector {
             databaseStatement = new MySQLDBStatement(new MySQLFactory());
         }
         databaseStatement.connect(hostname, database, user, password);
+        buildRolesTree();
     }
 
-    public void setUserID(int userID) {
+    public void setUserID(String userID) {
         this.userID = userID;
+        userAndChildren=new ArrayList<>();
+        userAndChildren.add(userID);
+        fillChildrenByID(userID);
     }
 
     private void buildRolesTree() {
-        // TODO: buildRolesTree
+        HashMap<String,List<String>> tree=new HashMap<>();
         databaseStatement.execute("SELECT * FROM roles");
         ResultSet resultSet = databaseStatement.getResultSet();
         try {
             while (resultSet.next()) {
-                int childID = resultSet.getInt("ChildID");
-                System.out.println("Found " + childID);
+                String roleID = resultSet.getString("RoleID");
+                String childID = resultSet.getString("ChildID");
+                if(tree.containsKey(roleID))
+                    tree.get(roleID).add(childID);
+                else {
+                    List<String> newChildren = new ArrayList<>();
+                    newChildren.add(childID);
+                    tree.put(roleID, newChildren);
+                }
             }
         } catch (java.sql.SQLException e) {
             e.printStackTrace();
         }
+        rolesTree=tree;
+    }
+    
+    private void fillChildrenByID(String userID) {
+        List<String> children = rolesTree.get(userID);
+        for (String child: children ) {
+            if(child==null)
+                return;
+            userAndChildren.add(child);
+            fillChildrenByID(child);
+        }
     }
 
-    private String prepareRoleConditionWithAnd(){
-        return null; //TODO
+    private String prepareRoleConditionWithAnd() {
+        StringBuilder stringBuilder = new StringBuilder(" (MinRole is null OR MinRole in (");
+        for (int i = 0; i < userAndChildren.size(); i++) {
+            stringBuilder.append("'" + userAndChildren.get(i) + "'");
+            if (i < userAndChildren.size() - 1)
+                stringBuilder.append(", ");
+        }
+        stringBuilder.append(")) and (");
+        return stringBuilder.toString();
     }
 
-    private String prepareRoleConditionWithouAnd(){
-        return null; //TODO
+    private String prepareRoleConditionWithoutAnd() {
+        StringBuilder stringBuilder = new StringBuilder("WHERE MinRole is null OR MinRole in (");
+        for (int i = 0; i < userAndChildren.size(); i++) {
+            stringBuilder.append("'" + userAndChildren.get(i) + "'");
+            if (i < userAndChildren.size() - 1)
+                stringBuilder.append(", ");
+        }
+        stringBuilder.append(") ");
+        return stringBuilder.toString();
     }
 
     public ResultSet execute(String query) {
@@ -68,23 +109,23 @@ public class SaveAccessProtector {
         String roleCondition;
         query = query.toUpperCase();
 
-        if (query.contains(Constants.WHERE)){
+        if (query.contains(Constants.WHERE)) {
             roleCondition = prepareRoleConditionWithAnd();
-            
+
             index = query.indexOf(Constants.WHERE);
             int roleConditionIndex = index + Constants.WHERE.length() + offset;
 
             prefixQuery = query.substring(0, roleConditionIndex - 1);
             suffixQuery = query.substring(roleConditionIndex);
-
+            // TODO: ")" at the end
             finalQuery = prefixQuery + " " + roleCondition + " " + suffixQuery;
         } else {
-            if(query.contains(Constants.GROUP_BY)){
+            if (query.contains(Constants.GROUP_BY)) {
                 index = query.indexOf(Constants.GROUP_BY);
-            } else if(query.contains(Constants.ORDER_BY)){
+            } else if (query.contains(Constants.ORDER_BY)) {
                 index = query.indexOf(Constants.ORDER_BY);
             }
-            roleCondition = prepareRoleConditionWithAnd();
+            roleCondition = prepareRoleConditionWithoutAnd();
             int roleConditionIndex = index - 1;
 
             prefixQuery = query.substring(0, roleConditionIndex);

@@ -18,7 +18,7 @@ public class MySQLStatement implements Statement {
         if (this.statement == null) {
             this.statement = connection.getConnection().createStatement();
         }
-        return this.statement;
+         return this.statement;
     }
 
 }
