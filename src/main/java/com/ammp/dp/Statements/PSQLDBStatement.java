@@ -13,21 +13,19 @@ public class PSQLDBStatement extends DatabaseStatement {
         this.factory=factory;
     }
     @Override
-    public void prepareStatment(String hostname, String database, String user, String password) {
+    public void connect(String hostname, String database, String user, String password) {
         connection = factory.createConenction(hostname, database, user, password);
+    }
+    @Override
+    protected void prepareStatment() throws SQLException {
         statement = factory.createStatement(connection);
-        try {
-            mysqlStatement = statement.getStatement();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        //        commit = factory.createCommit();
-
+        mysqlStatement = statement.getStatement();
     }
 
     @Override
     public void execute(String query) {
         try {
+            prepareStatment();
             mysqlStatement.execute(query);
         } catch (SQLException e) {
             e.printStackTrace();

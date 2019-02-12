@@ -41,14 +41,23 @@ public class SaveAccessProtector {
         } else if (dbType.equals(Constants.MYSQL)){
             databaseStatement = new MySQLDBStatement(new MySQLFactory());
         }
-
-        databaseStatement.prepareStatment(hostname, database, user, password);
+        databaseStatement.connect(hostname, database, user, password);
         databaseStatement.execute("SELECT * FROM roles");
         ResultSet resultSet = databaseStatement.getResultSet();
         try {
             while (resultSet.next()) {
                 int childID = resultSet.getInt("ChildID");
                 System.out.println("Found " + childID);
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+        databaseStatement.execute("SELECT * FROM roles");
+        ResultSet resultSett = databaseStatement.getResultSet();
+        try {
+            while (resultSett.next()) {
+                int childID = resultSett.getInt("ChildID");
+                System.out.println("Found2 " + childID);
             }
         } catch (java.sql.SQLException e) {
             e.printStackTrace();

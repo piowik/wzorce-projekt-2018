@@ -12,21 +12,20 @@ public class MySQLDBStatement extends DatabaseStatement {
         this.factory=factory;
     }
     @Override
-    public void prepareStatment(String hostname, String database, String user, String password) {
+    public void connect(String hostname, String database, String user, String password) {
         connection = factory.createConenction(hostname, database, user, password);
-        statement = factory.createStatement(connection);
-        try {
-            mysqlStatement = statement.getStatement();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        //        commit = factory.createCommit();
+    }
 
+    @Override
+    protected void prepareStatment() throws SQLException {
+        statement = factory.createStatement(connection);
+        mysqlStatement = statement.getStatement();
     }
 
     @Override
     public void execute(String query) {
         try {
+            prepareStatment();
             mysqlStatement.execute(query);
         } catch (SQLException e) {
             e.printStackTrace();
