@@ -29,7 +29,7 @@ public class SaveAccessProtector {
         private static SaveAccessProtector instance = new SaveAccessProtector();
     }
 
-    public SaveAccessProtector() { }
+    private SaveAccessProtector() { }
 
     public static SaveAccessProtector getInstance() {
         return Wrapper.instance;
