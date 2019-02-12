@@ -5,8 +5,8 @@ import com.ammp.dp.factory.*;
 public class MySQLFactory extends SQLFactory {
 
     @Override
-    public Connection createConenction(String hostname, String user, String password) {
-        return new MySQLConnection(hostname, user, password);
+    public Connection createConenction(String hostname, String database, String user, String password) {
+        return new MySQLConnection(hostname, database, user, password);
     }
 
     @Override

@@ -7,11 +7,13 @@ import java.sql.SQLException;
 
 public class PSQLConnection extends Connection {
     private String hostname;
+    private String database;
     private String user;
     private String password;
 
-    public PSQLConnection(String hostname, String user, String password) {
+    public PSQLConnection(String hostname, String database, String user, String password) {
         this.hostname = hostname;
+        this.database = database;
         this.user = user;
         this.password = password;
     }

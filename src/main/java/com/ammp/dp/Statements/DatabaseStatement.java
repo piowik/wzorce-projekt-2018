@@ -12,7 +12,7 @@ public abstract class DatabaseStatement {
     protected Commit commit;
     protected Connection connection;
 
-    public abstract void prepareStatment(String hostname, String user, String password);
+    public abstract void prepareStatment(String hostname, String database, String user, String password);
     public abstract void execute(String query );
     public abstract ResultSet getResultSet();
 //    public abstract ResultSet getResultSet();

@@ -10,8 +10,8 @@ import com.ammp.dp.factory.Statement;
 
 public class PostgreSQLFactory extends SQLFactory {
     @Override
-    public Connection createConenction(String hostname, String user, String password) {
-        return new PSQLConnection(hostname, user, password);
+    public Connection createConenction(String hostname, String database, String user, String password) {
+        return new PSQLConnection(hostname, database, user, password);
     }
 
     @Override

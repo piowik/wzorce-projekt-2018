@@ -12,8 +12,8 @@ public class MySQLDBStatement extends DatabaseStatement {
         this.factory=factory;
     }
     @Override
-    public void prepareStatment(String hostname, String user, String password) {
-        connection = factory.createConenction(hostname, user, password);
+    public void prepareStatment(String hostname, String database, String user, String password) {
+        connection = factory.createConenction(hostname, database, user, password);
         statement = factory.createStatement(connection);
         try {
             mysqlStatement = statement.getStatement();

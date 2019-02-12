@@ -26,7 +26,7 @@ public class SaveAccessProtector {
     private int userID;
     private java.sql.Connection conn;
 
-    public SaveAccessProtector(String hostname, String user, String password, String dbType) {
+    public SaveAccessProtector(String hostname, String database, String user, String password, String dbType) {
 
         if(dbType.equals(Constants.POSTGRESQL)){
             databaseStatement = new PSQLDBStatement(new PostgreSQLFactory());
@@ -34,7 +34,7 @@ public class SaveAccessProtector {
             databaseStatement = new MySQLDBStatement(new MySQLFactory());
         }
 
-        databaseStatement.prepareStatment(hostname, user, password);
+        databaseStatement.prepareStatment(hostname, database, user, password);
         databaseStatement.execute("SELECT * FROM roles");
         ResultSet resultSet = databaseStatement.getResultSet();
         try {
