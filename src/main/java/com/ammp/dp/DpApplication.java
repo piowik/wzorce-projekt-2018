@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DpApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DpApplication.class, args);
 		SaveAccessProtector gówno = new SaveAccessProtector("harryweb.atthost24.pl","1404_wzorce","Wz0rce2018","mysql");
+		SpringApplication.run(DpApplication.class, args);
 	}
 }

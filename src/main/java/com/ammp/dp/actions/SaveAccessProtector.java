@@ -20,6 +20,7 @@ public class SaveAccessProtector {
     private SQLFactory sqlFactory;
     private ArrayList<Integer> children;
     private int userID;
+    private java.sql.Connection conn;
 
     public SaveAccessProtector(String hostname, String user, String password, String dbType) {
 
@@ -30,6 +31,7 @@ public class SaveAccessProtector {
         }
 
         connection = Objects.requireNonNull(sqlFactory).createConenction(hostname, user, password);
+        conn= connection.getConnection();
     }
 
 
@@ -51,6 +53,6 @@ public class SaveAccessProtector {
 
         }
     }
-        java.sql.Connection conn = connection.getConnection();
+
 
 }
