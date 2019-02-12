@@ -27,7 +27,8 @@ public class SaveAccessProtector {
         connection = Objects.requireNonNull(sqlFactory).createConenction(hostname, user, password);
     }
 
-    public List<Object> selectFromDB(SQLInput sqlInput, long userId){
+
+    public List<Object> selectFromDB(SQLInput sqlInput){
         return null;
     }
 
