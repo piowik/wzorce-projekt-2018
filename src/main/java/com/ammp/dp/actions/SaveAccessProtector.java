@@ -25,9 +25,17 @@ public class SaveAccessProtector {
     private ArrayList<Integer> children;
     private int userID;
     private java.sql.Connection conn;
+    private static class Wrapper {
+        private static SaveAccessProtector instance = new SaveAccessProtector();
+    }
 
-    public SaveAccessProtector(String hostname, String database, String user, String password, String dbType) {
+    public SaveAccessProtector() { }
 
+    public static SaveAccessProtector getInstance() {
+        return Wrapper.instance;
+    }
+
+    public void connect(String hostname, String database, String user, String password, String dbType) {
         if(dbType.equals(Constants.POSTGRESQL)){
             databaseStatement = new PSQLDBStatement(new PostgreSQLFactory());
         } else if (dbType.equals(Constants.MYSQL)){
