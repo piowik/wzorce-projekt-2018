@@ -25,7 +25,7 @@ public class MySQLConnection extends Connection {
         java.sql.Connection conn = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(hostname, user, password);
+            conn = DriverManager.getConnection(JDBC_MYSQL + hostname, user, password);
         } catch (SQLException ex) {
             handleException(ex);
         } catch (ClassNotFoundException e) {

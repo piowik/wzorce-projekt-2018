@@ -1,14 +1,15 @@
 package com.ammp.dp.Statements;
 
+import com.ammp.dp.factory.PSQL.PostgreSQLFactory;
 import com.ammp.dp.factory.SQLFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class MySQLDBStatement extends DatabaseStatement {
+public class PSQLDBStatement extends DatabaseStatement {
     private SQLFactory factory;
     private java.sql.Statement mysqlStatement;
-    public MySQLDBStatement(SQLFactory factory){
+    public PSQLDBStatement(PostgreSQLFactory factory){
         this.factory=factory;
     }
     @Override
@@ -32,7 +33,6 @@ public class MySQLDBStatement extends DatabaseStatement {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public ResultSet getResultSet() {

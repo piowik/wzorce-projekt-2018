@@ -1,10 +1,14 @@
 package com.ammp.dp.actions;
 
+import com.ammp.dp.Statements.DatabaseStatement;
+import com.ammp.dp.Statements.MySQLDBStatement;
+import com.ammp.dp.Statements.PSQLDBStatement;
 import com.ammp.dp.factory.*;
 import com.ammp.dp.factory.MySQL.MySQLFactory;
 import com.ammp.dp.factory.PSQL.PostgreSQLFactory;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.SQLInput;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -17,7 +21,7 @@ public class SaveAccessProtector {
     private Connection connection;
     private Statement statement;
 
-    private SQLFactory sqlFactory;
+    private DatabaseStatement databaseStatement;
     private ArrayList<Integer> children;
     private int userID;
     private java.sql.Connection conn;
@@ -25,13 +29,22 @@ public class SaveAccessProtector {
     public SaveAccessProtector(String hostname, String user, String password, String dbType) {
 
         if(dbType.equals(Constants.POSTGRESQL)){
-            sqlFactory = new PostgreSQLFactory();
+            databaseStatement = new PSQLDBStatement(new PostgreSQLFactory());
         } else if (dbType.equals(Constants.MYSQL)){
-            sqlFactory = new MySQLFactory();
+            databaseStatement = new MySQLDBStatement(new MySQLFactory());
         }
 
-        connection = Objects.requireNonNull(sqlFactory).createConenction(hostname, user, password);
-        conn= connection.getConnection();
+        databaseStatement.prepareStatment(hostname, user, password);
+        databaseStatement.execute("SELECT * FROM roles");
+        ResultSet resultSet = databaseStatement.getResultSet();
+        try {
+            while (resultSet.next()) {
+                int childID = resultSet.getInt("ChildID");
+                System.out.println("Found " + childID);
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 
