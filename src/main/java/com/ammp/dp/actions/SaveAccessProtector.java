@@ -107,23 +107,26 @@ public class SaveAccessProtector {
         String prefixQuery;
         String finalQuery = "";
         String roleCondition;
-        query = query.toUpperCase();
+        String upperCaseQuery = query.toUpperCase();
 
-        if (query.contains(Constants.WHERE)) {
+        if (upperCaseQuery.contains(Constants.WHERE)) {
             roleCondition = prepareRoleConditionWithAnd();
 
-            index = query.indexOf(Constants.WHERE);
+            index = upperCaseQuery.indexOf(Constants.WHERE);
             int roleConditionIndex = index + Constants.WHERE.length() + offset;
 
             prefixQuery = query.substring(0, roleConditionIndex - 1);
-            suffixQuery = query.substring(roleConditionIndex);
-            // TODO: ")" at the end
-            finalQuery = prefixQuery + " " + roleCondition + " " + suffixQuery;
+            suffixQuery = query.substring(roleConditionIndex-1, query.length()-1);
+            // TODO: ")" at the end, line below works only when ends with condition
+            // eg. select * from example_table where Data is not null or Example_id > 3 order by Example_id;
+            //     select * from example_table where (MinRole is null OR MinRole in ('3', '6', '7', '8', '9', '10')) and (Data is not null or Example_id > 3) order by Example_id;
+            finalQuery = prefixQuery + " " + roleCondition + " " + suffixQuery + ");";
+            System.out.println(finalQuery);
         } else {
-            if (query.contains(Constants.GROUP_BY)) {
-                index = query.indexOf(Constants.GROUP_BY);
-            } else if (query.contains(Constants.ORDER_BY)) {
-                index = query.indexOf(Constants.ORDER_BY);
+            if (upperCaseQuery.contains(Constants.GROUP_BY)) {
+                index = upperCaseQuery.indexOf(Constants.GROUP_BY);
+            } else if (upperCaseQuery.contains(Constants.ORDER_BY)) {
+                index = upperCaseQuery.indexOf(Constants.ORDER_BY);
             }
             roleCondition = prepareRoleConditionWithoutAnd();
             int roleConditionIndex = index - 1;
