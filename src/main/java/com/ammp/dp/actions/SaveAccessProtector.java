@@ -1,5 +1,6 @@
 package com.ammp.dp.actions;
 
+import com.ammp.dp.QueryExtender;
 import com.ammp.dp.actions.Constants;
 import com.ammp.dp.Statements.DatabaseStatement;
 import com.ammp.dp.Statements.MySQLDBStatement;
@@ -78,7 +79,7 @@ public class SaveAccessProtector {
         }
     }
 
-    private String prepareRoleConditionWithAnd() {
+/*    private String prepareRoleConditionWithAnd() {
         StringBuilder stringBuilder = new StringBuilder(" (MinRole is null OR MinRole in (");
         for (int i = 0; i < userAndChildren.size(); i++) {
             stringBuilder.append("'" + userAndChildren.get(i) + "'");
@@ -98,10 +99,23 @@ public class SaveAccessProtector {
         }
         stringBuilder.append(") ");
         return stringBuilder.toString();
+    }*/
+
+    private String prepareCondition() {
+        StringBuilder stringBuilder = new StringBuilder("MinRole is null OR MinRole in (");
+        for (int i = 0; i < userAndChildren.size(); i++) {
+            stringBuilder.append("'");
+            stringBuilder.append(userAndChildren.get(i));
+            stringBuilder.append("'");
+            if (i < userAndChildren.size() - 1)
+                stringBuilder.append(", ");
+        }
+        stringBuilder.append(") ");
+        return stringBuilder.toString();
     }
 
     public ResultSet execute(String query) {
-        int offset = 2;
+        /*int offset = 2;
         int index = 0;
         String suffixQuery;
         String prefixQuery;
@@ -135,9 +149,14 @@ public class SaveAccessProtector {
             suffixQuery = query.substring(roleConditionIndex);
 
             finalQuery = prefixQuery + " " + roleCondition + " " + suffixQuery;
+        }*/
+        if (query.toUpperCase().contains(Constants.WHERE)) {
+           query = QueryExtender.extendWhere(query, prepareCondition());
+        } else {
+            query = QueryExtender.extendWhere(query, prepareCondition());
         }
-
-        databaseStatement.execute(finalQuery);
+        System.out.println(query);
+        databaseStatement.execute(query);
         return databaseStatement.getResultSet();
 
     }
