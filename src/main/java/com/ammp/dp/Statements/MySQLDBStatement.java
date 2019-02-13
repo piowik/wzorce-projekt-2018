@@ -36,6 +36,15 @@ public class MySQLDBStatement extends DatabaseStatement {
     }
 
     @Override
+    public void setAutoCommit(boolean value) {
+        try {
+            connection.getConnection().setAutoCommit(value);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void execute(String query) {
         try {
             prepareStatment();

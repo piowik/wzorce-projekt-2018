@@ -46,6 +46,15 @@ public class PSQLDBStatement extends DatabaseStatement {
     }
 
     @Override
+    public void setAutoCommit(boolean value) {
+        try {
+            connection.getConnection().setAutoCommit(value);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public ResultSet getResultSet() {
         try {
             return mysqlStatement.getResultSet();

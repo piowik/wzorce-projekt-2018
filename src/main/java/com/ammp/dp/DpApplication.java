@@ -21,13 +21,25 @@ public class DpApplication {
 
     public static void main(String[] args) {
         protecc.connect("harryweb.atthost24.pl", "1404_wzorce", "1404_wzorce", "Wz0rce2018", Constants.MYSQL);
-        // configure is optional to override default configuration
-        protecc.configure("roles", "RoleID", "ChildID", "MinRole", "users_roles", "UserID", false);
 
-        protecc.setUserID("46");
+        protecc.setUserID("3");
+
+        // OPTIONAL EXAMPLES START
+        // configure is optional to override default configuration
+//        protecc.configure("roles", "RoleID", "ChildID", "MinRole", "users_roles", "UserID", false);
 
         // rebuilding manually user roles
-        protecc.rebuildRoles();
+//        protecc.rebuildRoles();
+
+        // disabling auto commit and committing
+//        protecc.setAutoCommit(false);
+//        protecc.commit();
+        // OPTIONAL EXAMPLES END
+
+
+
+
+
 
         ResultSet resultSet = protecc.execute("select * from example_table where Data is not null;");
         try {

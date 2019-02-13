@@ -27,6 +27,7 @@ public class SaveAccessProtector {
     private String userRolesTable = "users_roles";
     private String userIdField = "UserID";
     private boolean autoRebuildRoles = false;
+    private boolean isAutoCommit = true;
 
 
     private static class Wrapper {
@@ -98,7 +99,8 @@ public class SaveAccessProtector {
                 ")", userRolesTable, userIdField, roleIdField);
         System.out.println(createUserRoles);
         databaseStatement.execute(createUserRoles);
-
+        if (!isAutoCommit)
+            databaseStatement.commit();
     }
 
     public void addRolesFields(String[] tableNames, String defaultRole) {
@@ -226,6 +228,14 @@ public class SaveAccessProtector {
         System.out.println(query);
         databaseStatement.execute(query);
         return databaseStatement.getResultSet();
+    }
 
+    public void setAutoCommit(boolean value) {
+        isAutoCommit = value;
+        databaseStatement.setAutoCommit(value);
+    }
+
+    public void commit() {
+        databaseStatement.commit();
     }
 }

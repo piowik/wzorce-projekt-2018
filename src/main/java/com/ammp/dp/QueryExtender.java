@@ -6,12 +6,27 @@ import java.util.regex.Pattern;
 
 
 public class QueryExtender {
-    /*private static final String regexNoWhere = "(select [a-zA-Z\\*]+(, )*[A-Z,a-z]* from [A-Za-z_]+[ ]*)(.*)";
-    private static final Pattern patternNoWhere = Pattern.compile(regexNoWhere);
-    private static final String regexWhere = "(select [a-zA-Z\\*]+(, )*[A-Z,a-z]* from [A-Za-z_]+) (where ([a-zA-Z]+ (= [a-zA-Z0-9]+|> [a-zA-Z0-9]+|< [a-zA-Z0-9]+|>= [a-zA-Z0-9]+|<= [a-zA-Z0-9]+|is null|is not null)( and | or )*)+)(.*)";
-    private static final Pattern patternWhere = Pattern.compile(regexWhere);*/
     private static final String regex = "(select [a-zA-Z\\*]+(, )*[A-Z,a-z]* from [A-Za-z_0-9]+)( where ([a-zA-Z]+ (= [a-zA-Z0-9]+|> [a-zA-Z0-9]+|< [a-zA-Z0-9]+|!= [a-zA-Z0-9]+|>= [a-zA-Z0-9]+|<= [a-zA-Z0-9]+|is null|is not null)( and | or )*)+)*(.*)";
     private static final Pattern pattern = Pattern.compile(regex);
+
+    public static String extendQuery(String input, String condition) {
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.matches()) {
+            StringBuilder outStr = new StringBuilder(matcher.group(1));
+            outStr.append(" where (");
+            outStr.append(condition);
+            outStr.append(")");
+            if (matcher.group(3) != null) {
+                outStr.append(" and (");
+                outStr.append(matcher.group(3).replace(" where ", ""));
+                outStr.append(")");
+            }
+            outStr.append(matcher.group(7));
+            return outStr.toString();
+        }
+        return "Error";
+    }
+
 
     private static ArrayList<String> getTestStrings() {
         ArrayList<String> strings = new ArrayList<>();
@@ -37,40 +52,6 @@ public class QueryExtender {
         return strings;
     }
 
-    public static String extendQuery(String input, String condition) {
-        Matcher matcher = pattern.matcher(input);
-        if (matcher.matches()) {
-            StringBuilder outStr = new StringBuilder(matcher.group(1));
-            outStr.append(" where (");
-            outStr.append(condition);
-            outStr.append(")");
-            if (matcher.group(3) != null) {
-                outStr.append(" and (");
-                outStr.append(matcher.group(3).replace(" where ", ""));
-                outStr.append(")");
-            }
-            outStr.append(matcher.group(7));
-            return outStr.toString();
-        }
-        return "Error";
-    }
-
-    /*public static String addWhere(String input, String condition) {
-        Matcher matcher = patternNoWhere.matcher(input);
-        if (matcher.matches()) {
-            return matcher.group(1) + " where (" + condition + ") " + matcher.group(3);
-        }
-        return "Error";
-    }
-
-    public static String extendWhere(String input, String condition) {
-        Matcher matcher = patternWhere.matcher(input);
-        if (matcher.matches()) {
-            return matcher.group(1) + " where (" + condition + ") and (" + matcher.group(3).replace("where ", "") + ")" + matcher.group(7);
-
-        }
-        return "Error";
-    }*/
 
     public static void main(String[] args) {
         ArrayList<String> strings = getTestStrings();

@@ -19,6 +19,8 @@ public abstract class DatabaseStatement {
 
     public abstract void commit();
 
+    public abstract void setAutoCommit(boolean value);
+
     public abstract void execute(String query);
 
     public abstract ResultSet getResultSet();
