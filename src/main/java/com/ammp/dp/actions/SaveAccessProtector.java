@@ -150,11 +150,7 @@ public class SaveAccessProtector {
 
             finalQuery = prefixQuery + " " + roleCondition + " " + suffixQuery;
         }*/
-        if (query.toUpperCase().contains(Constants.WHERE)) {
-           query = QueryExtender.extendWhere(query, prepareCondition());
-        } else {
-            query = QueryExtender.extendWhere(query, prepareCondition());
-        }
+       query = QueryExtender.extendQuery(query, prepareCondition());
         System.out.println(query);
         databaseStatement.execute(query);
         return databaseStatement.getResultSet();
