@@ -1,7 +1,6 @@
 package com.ammp.dp.actions;
 
 import com.ammp.dp.QueryExtender;
-import com.ammp.dp.actions.Constants;
 import com.ammp.dp.Statements.DatabaseStatement;
 import com.ammp.dp.Statements.MySQLDBStatement;
 import com.ammp.dp.Statements.PSQLDBStatement;
@@ -16,8 +15,16 @@ import java.util.List;
 public class SaveAccessProtector {
     private DatabaseStatement databaseStatement;
     private String userID;
-    private HashMap<String,List<String>> rolesTree;
-    private List<String> userAndChildren;
+    private HashMap<String, List<String>> rolesTree;
+    private List<String> userAndChildren = new ArrayList<>();
+    private String rolesTable = "roles";
+    private String roleIdField = "RoleID";
+    private String childIdField = "ChildID";
+    private String minRoleField = "MinRole";
+    private String userRolesTable = "users_roles";
+    private String userIdField = "UserID";
+    private boolean autoRebuildRoles = false;
+
 
     private static class Wrapper {
         private static SaveAccessProtector instance = new SaveAccessProtector();
@@ -42,20 +49,38 @@ public class SaveAccessProtector {
 
     public void setUserID(String userID) {
         this.userID = userID;
-        userAndChildren=new ArrayList<>();
+    }
+
+    public void buildRoles() {
+        userAndChildren.clear();
         userAndChildren.add(userID);
         fillChildrenByID(userID);
     }
 
+    public void configure(String rolesTable, String roleIdField, String childIdField, String minRoleField, String userRolesTable, String userIdField, boolean autoRebuildRoles) {
+        this.rolesTable = rolesTable;
+        this.roleIdField = roleIdField;
+        this.childIdField = childIdField;
+        this.minRoleField = minRoleField;
+        this.userRolesTable = userRolesTable;
+        this.userIdField = userIdField;
+        this.autoRebuildRoles = autoRebuildRoles;
+    }
+
+    public void setAutoRebuildRoles(boolean value) {
+        autoRebuildRoles = value;
+    }
+
+
     private void buildRolesTree() {
-        HashMap<String,List<String>> tree=new HashMap<>();
-        databaseStatement.execute("SELECT * FROM roles");
+        HashMap<String, List<String>> tree = new HashMap<>();
+        databaseStatement.execute("SELECT * FROM " + rolesTable);
         ResultSet resultSet = databaseStatement.getResultSet();
         try {
             while (resultSet.next()) {
-                String roleID = resultSet.getString("RoleID");
-                String childID = resultSet.getString("ChildID");
-                if(tree.containsKey(roleID))
+                String roleID = resultSet.getString(roleIdField);
+                String childID = resultSet.getString(childIdField);
+                if (tree.containsKey(roleID))
                     tree.get(roleID).add(childID);
                 else {
                     List<String> newChildren = new ArrayList<>();
@@ -66,13 +91,13 @@ public class SaveAccessProtector {
         } catch (java.sql.SQLException e) {
             e.printStackTrace();
         }
-        rolesTree=tree;
+        rolesTree = tree;
     }
-    
+
     private void fillChildrenByID(String userID) {
         List<String> children = rolesTree.get(userID);
-        for (String child: children ) {
-            if(child==null)
+        for (String child : children) {
+            if (child == null)
                 return;
             userAndChildren.add(child);
             fillChildrenByID(child);
@@ -102,7 +127,7 @@ public class SaveAccessProtector {
     }*/
 
     private String prepareCondition() {
-        StringBuilder stringBuilder = new StringBuilder("MinRole is null OR MinRole in (");
+        StringBuilder stringBuilder = new StringBuilder(minRoleField + " is null OR " + minRoleField + " in (");
         for (int i = 0; i < userAndChildren.size(); i++) {
             stringBuilder.append("'");
             stringBuilder.append(userAndChildren.get(i));
@@ -150,7 +175,9 @@ public class SaveAccessProtector {
 
             finalQuery = prefixQuery + " " + roleCondition + " " + suffixQuery;
         }*/
-       query = QueryExtender.extendQuery(query, prepareCondition());
+        if (autoRebuildRoles)
+            buildRoles();
+        query = QueryExtender.extendQuery(query, prepareCondition());
         System.out.println(query);
         databaseStatement.execute(query);
         return databaseStatement.getResultSet();
