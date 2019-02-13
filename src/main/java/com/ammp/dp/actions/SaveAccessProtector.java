@@ -6,6 +6,8 @@ import com.ammp.dp.Statements.MySQLDBStatement;
 import com.ammp.dp.Statements.PSQLDBStatement;
 import com.ammp.dp.factory.MySQL.MySQLFactory;
 import com.ammp.dp.factory.PSQL.PSQLFactory;
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+import org.yaml.snakeyaml.scanner.Constant;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -216,9 +218,11 @@ public class SaveAccessProtector {
 
             finalQuery = prefixQuery + " " + roleCondition + " " + suffixQuery;
         }*/
-        if (autoRebuildRoles)
-            rebuildRoles();
-        query = QueryExtender.extendQuery(query, prepareCondition());
+        if (query.toUpperCase().contains(Constants.SELECT)) {
+            if (autoRebuildRoles)
+                rebuildRoles();
+            query = QueryExtender.extendQuery(query, prepareCondition());
+        }
         System.out.println(query);
         databaseStatement.execute(query);
         return databaseStatement.getResultSet();
