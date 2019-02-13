@@ -164,15 +164,19 @@ public class SaveAccessProtector {
     }*/
 
     private String prepareCondition() {
-        StringBuilder stringBuilder = new StringBuilder(minRoleField + " is null OR " + minRoleField + " in (");
-        for (int i = 0; i < userAndChildren.size(); i++) {
-            stringBuilder.append("'");
-            stringBuilder.append(userAndChildren.get(i));
-            stringBuilder.append("'");
-            if (i < userAndChildren.size() - 1)
-                stringBuilder.append(", ");
+        StringBuilder stringBuilder = new StringBuilder(minRoleField);
+        stringBuilder.append(" is null");
+        if (userRole != null) {
+            stringBuilder.append(" OR " + minRoleField + " in (");
+            for (int i = 0; i < userAndChildren.size(); i++) {
+                stringBuilder.append("'");
+                stringBuilder.append(userAndChildren.get(i));
+                stringBuilder.append("'");
+                if (i < userAndChildren.size() - 1)
+                    stringBuilder.append(", ");
+            }
+            stringBuilder.append(") ");
         }
-        stringBuilder.append(") ");
         return stringBuilder.toString();
     }
 
