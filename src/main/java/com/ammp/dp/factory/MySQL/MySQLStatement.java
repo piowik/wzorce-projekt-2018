@@ -7,7 +7,6 @@ import java.sql.SQLException;
 
 public class MySQLStatement implements Statement {
     private Connection connection;
-    private java.sql.Statement statement;
 
     public MySQLStatement(Connection connection) {
         this.connection = connection;
@@ -15,8 +14,7 @@ public class MySQLStatement implements Statement {
 
     @Override
     public java.sql.Statement getStatement() throws SQLException {
-        this.statement = connection.getConnection().createStatement();
-        return this.statement;
+        return connection.getConnection().createStatement();
     }
 
 }

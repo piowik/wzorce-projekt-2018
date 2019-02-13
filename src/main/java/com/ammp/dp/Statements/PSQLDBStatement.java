@@ -37,8 +37,9 @@ public class PSQLDBStatement extends DatabaseStatement {
 
     @Override
     public void commit() {
+        commit = factory.createCommit(connection);
         try {
-            commit.createCommit(connection);
+            commit.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }

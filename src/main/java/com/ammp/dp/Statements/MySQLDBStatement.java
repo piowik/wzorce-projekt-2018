@@ -1,5 +1,6 @@
 package com.ammp.dp.Statements;
 
+import com.ammp.dp.factory.Commit;
 import com.ammp.dp.factory.SQLFactory;
 
 import java.sql.ResultSet;
@@ -26,8 +27,9 @@ public class MySQLDBStatement extends DatabaseStatement {
 
     @Override
     public void commit() {
+        commit = factory.createCommit(connection);
         try {
-            commit.createCommit(connection);
+            commit.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }

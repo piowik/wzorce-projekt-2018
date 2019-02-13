@@ -13,11 +13,11 @@ public class PSQLFactory extends SQLFactory {
 
     @Override
     public Statement createStatement(Connection connection) {
-        return null;
+        return new PSQLStatement(connection);
     }
 
     @Override
     public Commit createCommit(Connection connection) {
-        return new PSQLCommit();
+        return new PSQLCommit(connection);
     }
 }

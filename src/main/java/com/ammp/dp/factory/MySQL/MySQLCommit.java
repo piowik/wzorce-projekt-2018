@@ -6,10 +6,13 @@ import com.ammp.dp.factory.Connection;
 import java.sql.SQLException;
 
 public class MySQLCommit implements Commit {
+    private Connection connection;
 
+    MySQLCommit(Connection conn) {
+        connection = conn;
+    }
     @Override
-    public void createCommit(Connection connection) throws SQLException {
+    public void commit() throws SQLException {
         connection.getConnection().commit();
-
     }
 }

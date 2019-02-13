@@ -7,7 +7,6 @@ import java.sql.SQLException;
 
 public class PSQLStatement implements Statement {
     private Connection connection;
-    private java.sql.Statement statement;
 
     public PSQLStatement(Connection connection) {
         this.connection = connection;
@@ -15,7 +14,6 @@ public class PSQLStatement implements Statement {
 
     @Override
     public java.sql.Statement getStatement() throws SQLException {
-        this.statement = connection.getConnection().createStatement();
-        return this.statement;
+        return connection.getConnection().createStatement();
     }
 }
