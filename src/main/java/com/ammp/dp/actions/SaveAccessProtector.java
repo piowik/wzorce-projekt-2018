@@ -66,6 +66,7 @@ public class SaveAccessProtector {
     }
 
     public void rebuildRoles() {
+        userAndChildren.clear();
         buildRolesTree();
         userAndChildren.add(userRole);
         fillChildrenByRole(userRole);
