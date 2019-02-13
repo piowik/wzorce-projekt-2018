@@ -8,23 +8,36 @@ import java.sql.ResultSet;
 
 @SpringBootApplication
 public class DpApplication {
+    private static final SaveAccessProtector protecc = SaveAccessProtector.getInstance();
+
+    private static void exampleFirstTimeUse() {
+        // example initialization for first time use (no tables, no columns)
+        protecc.configure("acl_roles", "role_id", "child_id", "min_role", "user_roles", "user_id", false);
+        protecc.buildTableStructure();
+        String[] tableNames = {"example_table3"};
+        protecc.addRolesFields(tableNames, "null");
+    }
+
 
     public static void main(String[] args) {
-        SaveAccessProtector protecc = SaveAccessProtector.getInstance();
         protecc.connect("harryweb.atthost24.pl", "1404_wzorce", "1404_wzorce", "Wz0rce2018", Constants.MYSQL);
         // configure is optional to override default configuration
-        protecc.configure("roles_two", "RoleID", "ChildID", "MinRole", "users_roles_two", "UserID", false);
-//        protecc.setUserID("3");
-//        protecc.buildRoles();
-//        ResultSet resultSet = protecc.execute("select * from example_table where Data is not null;");
-//        try {
-//            while (resultSet.next()) {
-//                String data = resultSet.getString("Data");
-//                System.out.println(data);
-//            }
-//        } catch (java.sql.SQLException e) {
-//            e.printStackTrace();
-//        }
+        protecc.configure("roles", "RoleID", "ChildID", "MinRole", "users_roles", "UserID", false);
+
+        protecc.setUserID("3");
+
+        // rebuilding manually user roles
+        protecc.rebuildRoles();
+
+        ResultSet resultSet = protecc.execute("select * from example_table where Data is not null;");
+        try {
+            while (resultSet.next()) {
+                String data = resultSet.getString("Data");
+                System.out.println(data);
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
 //		SpringApplication.run(DpApplication.class, args);
     }
 }

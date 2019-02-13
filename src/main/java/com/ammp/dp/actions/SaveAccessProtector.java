@@ -44,15 +44,15 @@ public class SaveAccessProtector {
             databaseStatement = new MySQLDBStatement(new MySQLFactory());
         }
         databaseStatement.connect(hostname, database, user, password);
-        buildRolesTree();
     }
 
     public void setUserID(String userID) {
         this.userID = userID;
+        rebuildRoles();
     }
 
-    public void buildRoles() {
-        userAndChildren.clear();
+    public void rebuildRoles() {
+        buildRolesTree();
         userAndChildren.add(userID);
         fillChildrenByID(userID);
     }
@@ -67,10 +67,30 @@ public class SaveAccessProtector {
         this.autoRebuildRoles = autoRebuildRoles;
     }
 
-    public void setAutoRebuildRoles(boolean value) {
-        autoRebuildRoles = value;
+    public void buildTableStructure() {
+        String createRoles = String.format("CREATE TABLE IF NOT EXISTS `%s` (\n" +
+                "  `%s` int(11) NOT NULL,\n" +
+                "  `%s` int(11) DEFAULT NULL\n" +
+                ")", rolesTable, roleIdField, childIdField);
+        System.out.println(createRoles);
+        databaseStatement.execute(createRoles);
+
+        String createUserRoles = String.format("CREATE TABLE IF NOT EXISTS `%s` (\n" +
+                "  `%s` int(11) NOT NULL,\n" +
+                "  `%s` int(11) NOT NULL\n" +
+                ")", userRolesTable, userIdField, roleIdField);
+        System.out.println(createUserRoles);
+        databaseStatement.execute(createUserRoles);
+
     }
 
+    public void addRolesFields(String[] tableNames, String defaultRole) {
+        // if it throws duplicate column then it is user's fault - there is no way to check if column exists AND stay independent to MySQL / postgres version
+        for (String tableName : tableNames) {
+            String alterQuery = String.format("ALTER TABLE %s ADD %s int(11) %s", tableName, minRoleField, defaultRole);
+            databaseStatement.execute(alterQuery);
+        }
+    }
 
     private void buildRolesTree() {
         HashMap<String, List<String>> tree = new HashMap<>();
@@ -176,7 +196,7 @@ public class SaveAccessProtector {
             finalQuery = prefixQuery + " " + roleCondition + " " + suffixQuery;
         }*/
         if (autoRebuildRoles)
-            buildRoles();
+            rebuildRoles();
         query = QueryExtender.extendQuery(query, prepareCondition());
         System.out.println(query);
         databaseStatement.execute(query);
