@@ -15,6 +15,7 @@ import java.util.List;
 public class SaveAccessProtector {
     private DatabaseStatement databaseStatement;
     private String userID;
+    private String userRole;
     private HashMap<String, List<String>> rolesTree;
     private List<String> userAndChildren = new ArrayList<>();
     private String rolesTable = "roles";
@@ -47,14 +48,27 @@ public class SaveAccessProtector {
     }
 
     public void setUserID(String userID) {
-        this.userID = userID;
+        String query ="SELECT * FROM " + userRolesTable+" WHERE UserID="+userID;
+        databaseStatement.execute(query);
+        ResultSet resultSet = databaseStatement.getResultSet();
+        this.userID=userID;
+        try {
+            if(resultSet.next())
+                this.userRole=resultSet.getString(roleIdField);
+            else
+                this.userRole=null;
+            }
+         catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+
         rebuildRoles();
     }
 
     public void rebuildRoles() {
         buildRolesTree();
-        userAndChildren.add(userID);
-        fillChildrenByID(userID);
+        userAndChildren.add(userRole);
+        fillChildrenByRole(userRole);
     }
 
     public void configure(String rolesTable, String roleIdField, String childIdField, String minRoleField, String userRolesTable, String userIdField, boolean autoRebuildRoles) {
@@ -114,13 +128,15 @@ public class SaveAccessProtector {
         rolesTree = tree;
     }
 
-    private void fillChildrenByID(String userID) {
-        List<String> children = rolesTree.get(userID);
+    private void fillChildrenByRole(String userRole) {
+        if (userRole==null)
+            return;
+        List<String> children = rolesTree.get(userRole);
         for (String child : children) {
             if (child == null)
                 return;
             userAndChildren.add(child);
-            fillChildrenByID(child);
+            fillChildrenByRole(child);
         }
     }
 

@@ -24,7 +24,7 @@ public class DpApplication {
         // configure is optional to override default configuration
         protecc.configure("roles", "RoleID", "ChildID", "MinRole", "users_roles", "UserID", false);
 
-        protecc.setUserID("3");
+        protecc.setUserID("46");
 
         // rebuilding manually user roles
         protecc.rebuildRoles();
