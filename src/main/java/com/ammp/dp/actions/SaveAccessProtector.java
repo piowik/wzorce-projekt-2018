@@ -1,13 +1,13 @@
 package com.ammp.dp.actions;
 
-import com.ammp.dp.QueryExtender;
 import com.ammp.dp.Statements.DatabaseStatement;
 import com.ammp.dp.Statements.MySQLDBStatement;
 import com.ammp.dp.Statements.PSQLDBStatement;
+import com.ammp.dp.TemplateMethod.QueryDeleteExtender;
+import com.ammp.dp.TemplateMethod.QueryExtender;
+import com.ammp.dp.TemplateMethod.QuerySelectRegexExtender;
 import com.ammp.dp.factory.MySQL.MySQLFactory;
 import com.ammp.dp.factory.PSQL.PSQLFactory;
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
-import org.yaml.snakeyaml.scanner.Constant;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -16,17 +16,11 @@ import java.util.List;
 
 public class SaveAccessProtector {
     private DatabaseStatement databaseStatement;
+    private QueryExtender queryExtender;
     private String userID;
     private String userRole;
     private HashMap<String, List<String>> rolesTree;
     private List<String> userAndChildren = new ArrayList<>();
-    private String rolesTable = "roles";
-    private String roleIdField = "RoleID";
-    private String childIdField = "ChildID";
-    private String minRoleField = "MinRole";
-    private String userRolesTable = "users_roles";
-    private String userIdField = "UserID";
-    private boolean autoRebuildRoles = false;
     private boolean isAutoCommit = true;
 
 
@@ -51,13 +45,13 @@ public class SaveAccessProtector {
     }
 
     public void setUserID(String userID) {
-        String query ="SELECT * FROM " + userRolesTable+" WHERE UserID="+userID;
+        String query ="SELECT * FROM " + Constants.USER_ROLES_TABLE + " WHERE UserID="+userID;
         databaseStatement.execute(query);
         ResultSet resultSet = databaseStatement.getResultSet();
         this.userID=userID;
         try {
             if(resultSet.next())
-                this.userRole=resultSet.getString(roleIdField);
+                this.userRole=resultSet.getString(Constants.ROLE_ID_FIELD);
             else
                 this.userRole=null;
             }
@@ -75,28 +69,19 @@ public class SaveAccessProtector {
         fillChildrenByRole(userRole);
     }
 
-    public void configure(String rolesTable, String roleIdField, String childIdField, String minRoleField, String userRolesTable, String userIdField, boolean autoRebuildRoles) {
-        this.rolesTable = rolesTable;
-        this.roleIdField = roleIdField;
-        this.childIdField = childIdField;
-        this.minRoleField = minRoleField;
-        this.userRolesTable = userRolesTable;
-        this.userIdField = userIdField;
-        this.autoRebuildRoles = autoRebuildRoles;
-    }
 
     public void buildTableStructure() {
         String createRoles = String.format("CREATE TABLE IF NOT EXISTS `%s` (\n" +
                 "  `%s` int(11) NOT NULL,\n" +
                 "  `%s` int(11) DEFAULT NULL\n" +
-                ")", rolesTable, roleIdField, childIdField);
+                ")", Constants.ROLES_TABLE, Constants.ROLE_ID_FIELD, Constants.CHILD_ID_FILED);
         System.out.println(createRoles);
         databaseStatement.execute(createRoles);
 
         String createUserRoles = String.format("CREATE TABLE IF NOT EXISTS `%s` (\n" +
                 "  `%s` int(11) NOT NULL,\n" +
                 "  `%s` int(11) NOT NULL\n" +
-                ")", userRolesTable, userIdField, roleIdField);
+                ")", Constants.USER_ROLES_TABLE, Constants.CHILD_ID_FILED, Constants.ROLE_ID_FIELD);
         System.out.println(createUserRoles);
         databaseStatement.execute(createUserRoles);
         if (!isAutoCommit)
@@ -106,19 +91,19 @@ public class SaveAccessProtector {
     public void addRolesFields(String[] tableNames, String defaultRole) {
         // if it throws duplicate column then it is user's fault - there is no way to check if column exists AND stay independent to MySQL / postgres version
         for (String tableName : tableNames) {
-            String alterQuery = String.format("ALTER TABLE %s ADD %s int(11) %s", tableName, minRoleField, defaultRole);
+            String alterQuery = String.format("ALTER TABLE %s ADD %s int(11) %s", tableName, Constants.MIN_ROLE_FIELD, defaultRole);
             databaseStatement.execute(alterQuery);
         }
     }
 
     private void buildRolesTree() {
         HashMap<String, List<String>> tree = new HashMap<>();
-        databaseStatement.execute("SELECT * FROM " + rolesTable);
+        databaseStatement.execute("SELECT * FROM " + Constants.ROLES_TABLE);
         ResultSet resultSet = databaseStatement.getResultSet();
         try {
             while (resultSet.next()) {
-                String roleID = resultSet.getString(roleIdField);
-                String childID = resultSet.getString(childIdField);
+                String roleID = resultSet.getString(Constants.ROLE_ID_FIELD);
+                String childID = resultSet.getString(Constants.CHILD_ID_FILED);
                 if (tree.containsKey(roleID))
                     tree.get(roleID).add(childID);
                 else {
@@ -145,85 +130,21 @@ public class SaveAccessProtector {
         }
     }
 
-/*    private String prepareRoleConditionWithAnd() {
-        StringBuilder stringBuilder = new StringBuilder(" (MinRole is null OR MinRole in (");
-        for (int i = 0; i < userAndChildren.size(); i++) {
-            stringBuilder.append("'" + userAndChildren.get(i) + "'");
-            if (i < userAndChildren.size() - 1)
-                stringBuilder.append(", ");
-        }
-        stringBuilder.append(")) and (");
-        return stringBuilder.toString();
-    }
-
-    private String prepareRoleConditionWithoutAnd() {
-        StringBuilder stringBuilder = new StringBuilder("WHERE MinRole is null OR MinRole in (");
-        for (int i = 0; i < userAndChildren.size(); i++) {
-            stringBuilder.append("'" + userAndChildren.get(i) + "'");
-            if (i < userAndChildren.size() - 1)
-                stringBuilder.append(", ");
-        }
-        stringBuilder.append(") ");
-        return stringBuilder.toString();
-    }*/
-
-    private String prepareCondition() {
-        StringBuilder stringBuilder = new StringBuilder(minRoleField);
-        stringBuilder.append(" is null");
-        if (userRole != null) {
-            stringBuilder.append(" OR " + minRoleField + " in (");
-            for (int i = 0; i < userAndChildren.size(); i++) {
-                stringBuilder.append("'");
-                stringBuilder.append(userAndChildren.get(i));
-                stringBuilder.append("'");
-                if (i < userAndChildren.size() - 1)
-                    stringBuilder.append(", ");
-            }
-            stringBuilder.append(") ");
-        }
-        return stringBuilder.toString();
-    }
 
     public ResultSet execute(String query) {
-        /*int offset = 2;
-        int index = 0;
-        String suffixQuery;
-        String prefixQuery;
-        String finalQuery = "";
-        String roleCondition;
-        String upperCaseQuery = query.toUpperCase();
-
-        if (upperCaseQuery.contains(Constants.WHERE)) {
-            roleCondition = prepareRoleConditionWithAnd();
-
-            index = upperCaseQuery.indexOf(Constants.WHERE);
-            int roleConditionIndex = index + Constants.WHERE.length() + offset;
-
-            prefixQuery = query.substring(0, roleConditionIndex - 1);
-            suffixQuery = query.substring(roleConditionIndex-1, query.length()-1);
-            // TODO: ")" at the end, line below works only when ends with condition
-            // eg. select * from example_table where Data is not null or Example_id > 3 order by Example_id;
-            //     select * from example_table where (MinRole is null OR MinRole in ('3', '6', '7', '8', '9', '10')) and (Data is not null or Example_id > 3) order by Example_id;
-            finalQuery = prefixQuery + " " + roleCondition + " " + suffixQuery + ");";
-            System.out.println(finalQuery);
-        } else {
-            if (upperCaseQuery.contains(Constants.GROUP_BY)) {
-                index = upperCaseQuery.indexOf(Constants.GROUP_BY);
-            } else if (upperCaseQuery.contains(Constants.ORDER_BY)) {
-                index = upperCaseQuery.indexOf(Constants.ORDER_BY);
-            }
-            roleCondition = prepareRoleConditionWithoutAnd();
-            int roleConditionIndex = index - 1;
-
-            prefixQuery = query.substring(0, roleConditionIndex);
-            suffixQuery = query.substring(roleConditionIndex);
-
-            finalQuery = prefixQuery + " " + roleCondition + " " + suffixQuery;
-        }*/
+        boolean autoRebuildRoles = false;
         if (query.toUpperCase().contains(Constants.SELECT)) {
-            if (autoRebuildRoles)
+            if (autoRebuildRoles) {
                 rebuildRoles();
-            query = QueryExtender.extendQuery(query, prepareCondition());
+            }
+            queryExtender = new QuerySelectRegexExtender();
+            query = queryExtender.extendQuery(userAndChildren, userRole, query);
+        } else if(query.toUpperCase().contains(Constants.DELETE)){
+            if (autoRebuildRoles) {
+                rebuildRoles();
+            }
+            queryExtender = new QueryDeleteExtender();
+            query = queryExtender.extendQuery(userAndChildren, userRole, query);
         }
         System.out.println(query);
         databaseStatement.execute(query);

@@ -12,7 +12,6 @@ public class DpApplication {
 
     private static void exampleFirstTimeUse() {
         // example initialization for first time use (no tables, no columns)
-        protecc.configure("acl_roles", "role_id", "child_id", "min_role", "user_roles", "user_id", false);
         protecc.buildTableStructure();
         String[] tableNames = {"example_table3"};
         protecc.addRolesFields(tableNames, "null");
@@ -36,19 +35,16 @@ public class DpApplication {
 //        protecc.commit();
         // OPTIONAL EXAMPLES END
 
-
-
-
-
-
-        ResultSet resultSet = protecc.execute("select * from example_table where Data is not null;");
-        try {
-            while (resultSet.next()) {
-                String data = resultSet.getString("Data");
-                System.out.println(data);
+        ResultSet resultSet = protecc.execute("delete from example_table where Data= \'dane1_1\' ");
+        if(resultSet != null) {
+            try {
+                while (resultSet.next()) {
+                    String data = resultSet.getString("Data");
+                    System.out.println(data);
+                }
+            } catch (java.sql.SQLException e) {
+                e.printStackTrace();
             }
-        } catch (java.sql.SQLException e) {
-            e.printStackTrace();
         }
 //		SpringApplication.run(DpApplication.class, args);
     }

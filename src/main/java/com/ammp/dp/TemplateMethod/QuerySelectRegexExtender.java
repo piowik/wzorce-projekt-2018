@@ -1,15 +1,18 @@
-package com.ammp.dp;
+package com.ammp.dp.TemplateMethod;
+
+import com.ammp.dp.actions.Constants;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class QueryExtender {
+public class QuerySelectRegexExtender extends QueryExtender{
     private static final String regex = "(select [a-zA-Z\\*]+(, )*[A-Z,a-z]* from [A-Za-z_0-9]+)( where ([a-zA-Z]+ (= [a-zA-Z0-9]+|> [a-zA-Z0-9]+|< [a-zA-Z0-9]+|!= [a-zA-Z0-9]+|>= [a-zA-Z0-9]+|<= [a-zA-Z0-9]+|is null|is not null)( and | or )*)+)*(.*)";
     private static final Pattern pattern = Pattern.compile(regex);
 
-    public static String extendQuery(String input, String condition) {
+    String appendConditions(String input) {
         Matcher matcher = pattern.matcher(input);
         if (matcher.matches()) {
             StringBuilder outStr = new StringBuilder(matcher.group(1));
@@ -26,6 +29,24 @@ public class QueryExtender {
         }
         return "Error";
     }
+
+    String prepareCondition(List<String> userAndChildren, String userRole) {
+        StringBuilder stringBuilder = new StringBuilder(Constants.MIN_ROLE_FIELD);
+        stringBuilder.append(" is null");
+        if (userRole != null) {
+            stringBuilder.append(" OR " + Constants.MIN_ROLE_FIELD + " in (");
+            for (int i = 0; i < userAndChildren.size(); i++) {
+                stringBuilder.append("'");
+                stringBuilder.append(userAndChildren.get(i));
+                stringBuilder.append("'");
+                if (i < userAndChildren.size() - 1)
+                    stringBuilder.append(", ");
+            }
+            stringBuilder.append(") ");
+        }
+        return stringBuilder.toString();
+    }
+
 
 
     private static ArrayList<String> getTestStrings() {
@@ -53,21 +74,21 @@ public class QueryExtender {
     }
 
 
-    public static void main(String[] args) {
-        ArrayList<String> strings = getTestStrings();
-        ArrayList<String> output = new ArrayList<>();
-        String conditionString = "id < 0 and id in (0,1,2)";
-        for (String s : strings) {
-            if (s.toLowerCase().contains("where"))
-                output.add(extendQuery(s, conditionString));
-            else
-                output.add(extendQuery(s, conditionString));
-        }
-        for (int i = 0; i < strings.size(); i++) {
-            System.out.println("In: " + strings.get(i));
-            System.out.println("Out: " + output.get(i));
-        }
-    }
+//    public void main(String[] args) {
+//        ArrayList<String> strings = getTestStrings();
+//        ArrayList<String> output = new ArrayList<>();
+//        String conditionString = "id < 0 and id in (0,1,2)";
+//        for (String s : strings) {
+//            if (s.toLowerCase().contains("where"))
+//                output.add(extendQuery(s, conditionString));
+//            else
+//                output.add(extendQuery(s, conditionString));
+//        }
+//        for (int i = 0; i < strings.size(); i++) {
+//            System.out.println("In: " + strings.get(i));
+//            System.out.println("Out: " + output.get(i));
+//        }
+//    }
 
 
 }
