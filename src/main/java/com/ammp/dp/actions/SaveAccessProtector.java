@@ -22,6 +22,8 @@ public class SaveAccessProtector {
     private HashMap<String, List<String>> rolesTree;
     private List<String> userAndChildren = new ArrayList<>();
     private boolean isAutoCommit = true;
+    private boolean autoRebuildRoles = false;
+
 
 
     private static class Wrapper {
@@ -67,6 +69,10 @@ public class SaveAccessProtector {
         buildRolesTree();
         userAndChildren.add(userRole);
         fillChildrenByRole(userRole);
+    }
+
+    public void setAutoRebuildRoles(boolean value) {
+        autoRebuildRoles = value;
     }
 
 
@@ -132,7 +138,6 @@ public class SaveAccessProtector {
 
 
     public ResultSet execute(String query) {
-        boolean autoRebuildRoles = false;
         if (query.toUpperCase().contains(Constants.SELECT)) {
             if (autoRebuildRoles) {
                 rebuildRoles();
