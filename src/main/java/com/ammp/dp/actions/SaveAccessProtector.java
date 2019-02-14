@@ -89,7 +89,7 @@ public class SaveAccessProtector {
     }
 
     private void getUserRole() {
-        String query = "SELECT * FROM " + Constants.USER_ROLES_TABLE + " WHERE UserID=" + userID;
+        String query = "SELECT * FROM " + Constants.USER_ROLES_TABLE + " WHERE " + Constants.USER_ID_FIELD + "=" + userID;
         databaseStatement.execute(query);
         ResultSet resultSet = databaseStatement.getResultSet();
         try {

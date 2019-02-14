@@ -31,12 +31,12 @@ public class QueryDeleteExtender extends QueryExtender {
     @Override
     String prepareCondition(List<String> userAndChildren, String userRole) {
         if (input.toUpperCase().contains(Constants.WHERE)) {
-            StringBuilder stringBuilder = new StringBuilder(" (MinRole is null OR MinRole in (");
+            StringBuilder stringBuilder = new StringBuilder(" (" + Constants.MIN_ROLE_FIELD + " is null OR " + Constants.MIN_ROLE_FIELD + " in (");
             buildConditionFromList(userAndChildren, stringBuilder);
             stringBuilder.append(")) and (");
             return stringBuilder.toString();
         } else {
-            StringBuilder stringBuilder = new StringBuilder("WHERE (MinRole is null OR MinRole in (");
+            StringBuilder stringBuilder = new StringBuilder("WHERE (" + Constants.MIN_ROLE_FIELD + " is null OR " + Constants.MIN_ROLE_FIELD + " in (");
             buildConditionFromList(userAndChildren, stringBuilder);
             stringBuilder.append(")) ");
             return stringBuilder.toString();
