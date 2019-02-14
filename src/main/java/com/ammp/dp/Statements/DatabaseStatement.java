@@ -15,7 +15,7 @@ public abstract class DatabaseStatement {
 
     public abstract void connect(String hostname, String database, String user, String password);
 
-    protected abstract void prepareStatment() throws SQLException;
+    protected abstract void prepareStatement() throws SQLException;
 
     public abstract void commit();
 

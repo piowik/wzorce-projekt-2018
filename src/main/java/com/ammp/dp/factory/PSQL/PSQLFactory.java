@@ -7,7 +7,7 @@ import com.ammp.dp.factory.Statement;
 
 public class PSQLFactory extends SQLFactory {
     @Override
-    public Connection createConenction(String hostname, String database, String user, String password) {
+    public Connection createConnection(String hostname, String database, String user, String password) {
         return new PSQLConnection(hostname, database, user, password);
     }
 

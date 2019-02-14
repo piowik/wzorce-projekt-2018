@@ -7,9 +7,11 @@ import java.sql.SQLException;
 
 public class PSQLCommit implements Commit {
     private Connection connection;
+
     PSQLCommit(Connection conn) {
         connection = conn;
     }
+
     @Override
     public void commit() throws SQLException {
         connection.getConnection().commit();

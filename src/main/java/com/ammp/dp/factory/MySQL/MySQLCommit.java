@@ -11,6 +11,7 @@ public class MySQLCommit implements Commit {
     MySQLCommit(Connection conn) {
         connection = conn;
     }
+
     @Override
     public void commit() throws SQLException {
         connection.getConnection().commit();

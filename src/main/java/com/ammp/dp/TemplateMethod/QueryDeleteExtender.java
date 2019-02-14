@@ -20,7 +20,7 @@ public class QueryDeleteExtender extends QueryExtender {
             suffixQuery = input.substring(roleConditionIndex - 1, input.length() - 1);
             return prefixQuery + " " + condition + suffixQuery + ");";
         } else {
-            if(input.contains(";")){
+            if (input.contains(";")) {
                 input = input.replace(";", "");
             }
             return input + condition + ";";
@@ -30,13 +30,12 @@ public class QueryDeleteExtender extends QueryExtender {
 
     @Override
     String prepareCondition(List<String> userAndChildren, String userRole) {
-        if(input.toUpperCase().contains(Constants.WHERE)){
+        if (input.toUpperCase().contains(Constants.WHERE)) {
             StringBuilder stringBuilder = new StringBuilder(" (MinRole is null OR MinRole in (");
             buildConditionFromList(userAndChildren, stringBuilder);
             stringBuilder.append(")) and (");
             return stringBuilder.toString();
-        }
-        else {
+        } else {
             StringBuilder stringBuilder = new StringBuilder("WHERE (MinRole is null OR MinRole in (");
             buildConditionFromList(userAndChildren, stringBuilder);
             stringBuilder.append(")) ");

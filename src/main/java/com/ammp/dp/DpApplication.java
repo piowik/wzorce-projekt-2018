@@ -34,7 +34,7 @@ public class DpApplication {
 
         ResultSet resultSet = protecc.execute("select * from example_table");
 //        ResultSet resultSet = protecc.execute("delete from example_table where Data= \'dane1_1\' ");
-        if(resultSet != null) {
+        if (resultSet != null) {
             try {
                 while (resultSet.next()) {
                     String data = resultSet.getString("Data");

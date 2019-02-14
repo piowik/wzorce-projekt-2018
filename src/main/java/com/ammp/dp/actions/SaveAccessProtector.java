@@ -16,14 +16,12 @@ import java.util.List;
 
 public class SaveAccessProtector {
     private DatabaseStatement databaseStatement;
-    private QueryExtender queryExtender;
     private String userID;
     private String userRole;
     private HashMap<String, List<String>> rolesTree;
     private List<String> userAndChildren = new ArrayList<>();
     private boolean isAutoCommit = true;
     private boolean autoRebuildRoles = false;
-
 
 
     private static class Wrapper {
@@ -47,7 +45,7 @@ public class SaveAccessProtector {
     }
 
     public void setUserID(String userID) {
-        this.userID=userID;
+        this.userID = userID;
         rebuildRoles();
     }
 
@@ -91,16 +89,15 @@ public class SaveAccessProtector {
     }
 
     private void getUserRole() {
-        String query ="SELECT * FROM " + Constants.USER_ROLES_TABLE + " WHERE UserID="+userID;
+        String query = "SELECT * FROM " + Constants.USER_ROLES_TABLE + " WHERE UserID=" + userID;
         databaseStatement.execute(query);
         ResultSet resultSet = databaseStatement.getResultSet();
         try {
-            if(resultSet.next())
-                this.userRole=resultSet.getString(Constants.ROLE_ID_FIELD);
+            if (resultSet.next())
+                this.userRole = resultSet.getString(Constants.ROLE_ID_FIELD);
             else
-                this.userRole=null;
-        }
-        catch (java.sql.SQLException e) {
+                this.userRole = null;
+        } catch (java.sql.SQLException e) {
             e.printStackTrace();
         }
     }
@@ -128,7 +125,7 @@ public class SaveAccessProtector {
     }
 
     private void fillChildrenByRole(String userRole) {
-        if (userRole==null)
+        if (userRole == null)
             return;
         List<String> children = rolesTree.get(userRole);
         for (String child : children) {
@@ -141,13 +138,14 @@ public class SaveAccessProtector {
 
 
     public ResultSet execute(String query) {
+        QueryExtender queryExtender;
         if (query.toUpperCase().contains(Constants.SELECT)) {
             if (autoRebuildRoles) {
                 rebuildRoles();
             }
             queryExtender = new QuerySelectRegexExtender();
             query = queryExtender.extendQuery(userAndChildren, userRole, query);
-        } else if(query.toUpperCase().contains(Constants.DELETE)){
+        } else if (query.toUpperCase().contains(Constants.DELETE)) {
             if (autoRebuildRoles) {
                 rebuildRoles();
             }

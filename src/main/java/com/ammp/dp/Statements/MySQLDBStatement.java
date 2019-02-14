@@ -1,6 +1,5 @@
 package com.ammp.dp.Statements;
 
-import com.ammp.dp.factory.Commit;
 import com.ammp.dp.factory.SQLFactory;
 
 import java.sql.ResultSet;
@@ -16,11 +15,11 @@ public class MySQLDBStatement extends DatabaseStatement {
 
     @Override
     public void connect(String hostname, String database, String user, String password) {
-        connection = factory.createConenction(hostname, database, user, password);
+        connection = factory.createConnection(hostname, database, user, password);
     }
 
     @Override
-    protected void prepareStatment() throws SQLException {
+    protected void prepareStatement() throws SQLException {
         statement = factory.createStatement(connection);
         mysqlStatement = statement.getStatement();
     }
@@ -47,7 +46,7 @@ public class MySQLDBStatement extends DatabaseStatement {
     @Override
     public void execute(String query) {
         try {
-            prepareStatment();
+            prepareStatement();
             mysqlStatement.execute(query);
         } catch (SQLException e) {
             e.printStackTrace();
