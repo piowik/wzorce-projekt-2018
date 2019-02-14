@@ -5,6 +5,10 @@ import com.ammp.dp.actions.Constants;
 import java.util.List;
 
 public class QueryDeleteExtender extends QueryExtender {
+    String idname;
+    public QueryDeleteExtender(String idName) {
+        idname = idName;
+    }
     @Override
     String appendConditions(String input) {
         int offset = 2;

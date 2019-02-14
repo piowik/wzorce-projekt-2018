@@ -137,19 +137,19 @@ public class SaveAccessProtector {
     }
 
 
-    public ResultSet execute(String query) {
+    public ResultSet execute(String query, String idName) {
         QueryExtender queryExtender;
         if (query.toUpperCase().contains(Constants.SELECT)) {
             if (autoRebuildRoles) {
                 rebuildRoles();
             }
-            queryExtender = new QuerySelectRegexExtender();
+            queryExtender = new QuerySelectRegexExtender(idName);
             query = queryExtender.extendQuery(userAndChildren, userRole, query);
         } else if (query.toUpperCase().contains(Constants.DELETE)) {
             if (autoRebuildRoles) {
                 rebuildRoles();
             }
-            queryExtender = new QueryDeleteExtender();
+            queryExtender = new QueryDeleteExtender(idName);
             query = queryExtender.extendQuery(userAndChildren, userRole, query);
         }
         System.out.println(query);

@@ -2,6 +2,7 @@ package com.ammp.dp;
 
 import com.ammp.dp.actions.Constants;
 import com.ammp.dp.actions.SaveAccessProtector;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.sql.ResultSet;
@@ -21,7 +22,7 @@ public class DpApplication {
     public static void main(String[] args) {
         protecc.connect("harryweb.atthost24.pl", "1404_wzorce", "1404_wzorce", "Wz0rce2018", Constants.MYSQL);
 
-        protecc.setUserID("3");
+        protecc.setUserID("12");
 
         // OPTIONAL EXAMPLES START
         // rebuilding manually user roles
@@ -32,12 +33,12 @@ public class DpApplication {
 //        protecc.commit();
         // OPTIONAL EXAMPLES END
 
-        ResultSet resultSet = protecc.execute("select * from example_table");
+        ResultSet resultSet = protecc.execute("select * from example_table2", "Example2ID");
 //        ResultSet resultSet = protecc.execute("delete from example_table where Data= \'dane1_1\' ");
         if (resultSet != null) {
             try {
                 while (resultSet.next()) {
-                    String data = resultSet.getString("Data");
+                    String data = resultSet.getString("Data2");
                     System.out.println(data);
                 }
             } catch (java.sql.SQLException e) {
