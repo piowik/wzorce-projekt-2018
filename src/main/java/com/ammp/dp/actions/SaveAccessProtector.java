@@ -47,24 +47,12 @@ public class SaveAccessProtector {
     }
 
     public void setUserID(String userID) {
-        String query ="SELECT * FROM " + Constants.USER_ROLES_TABLE + " WHERE UserID="+userID;
-        databaseStatement.execute(query);
-        ResultSet resultSet = databaseStatement.getResultSet();
         this.userID=userID;
-        try {
-            if(resultSet.next())
-                this.userRole=resultSet.getString(Constants.ROLE_ID_FIELD);
-            else
-                this.userRole=null;
-            }
-         catch (java.sql.SQLException e) {
-            e.printStackTrace();
-        }
-
         rebuildRoles();
     }
 
     public void rebuildRoles() {
+        getUserRole();
         userAndChildren.clear();
         buildRolesTree();
         userAndChildren.add(userRole);
@@ -99,6 +87,21 @@ public class SaveAccessProtector {
         for (String tableName : tableNames) {
             String alterQuery = String.format("ALTER TABLE %s ADD %s int(11) %s", tableName, Constants.MIN_ROLE_FIELD, defaultRole);
             databaseStatement.execute(alterQuery);
+        }
+    }
+
+    private void getUserRole() {
+        String query ="SELECT * FROM " + Constants.USER_ROLES_TABLE + " WHERE UserID="+userID;
+        databaseStatement.execute(query);
+        ResultSet resultSet = databaseStatement.getResultSet();
+        try {
+            if(resultSet.next())
+                this.userRole=resultSet.getString(Constants.ROLE_ID_FIELD);
+            else
+                this.userRole=null;
+        }
+        catch (java.sql.SQLException e) {
+            e.printStackTrace();
         }
     }
 

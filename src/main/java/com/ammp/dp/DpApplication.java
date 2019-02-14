@@ -24,9 +24,6 @@ public class DpApplication {
         protecc.setUserID("3");
 
         // OPTIONAL EXAMPLES START
-        // configure is optional to override default configuration
-//        protecc.configure("roles", "RoleID", "ChildID", "MinRole", "users_roles", "UserID", false);
-
         // rebuilding manually user roles
 //        protecc.rebuildRoles();
 
@@ -35,7 +32,8 @@ public class DpApplication {
 //        protecc.commit();
         // OPTIONAL EXAMPLES END
 
-        ResultSet resultSet = protecc.execute("delete from example_table where Data= \'dane1_1\' ");
+        ResultSet resultSet = protecc.execute("select * from example_table");
+//        ResultSet resultSet = protecc.execute("delete from example_table where Data= \'dane1_1\' ");
         if(resultSet != null) {
             try {
                 while (resultSet.next()) {
